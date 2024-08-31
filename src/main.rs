@@ -1,25 +1,33 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
+use std::process;
+fn prompt(command: &str) {
+    println!("{}: command not found", command);
+}
+
+fn tokenize(input: &str) -> Vec<&str> {
+    input.split(' ').collect()
+}
 
 fn main() {
-    let stdin = io::stdin();
-    let mut input = String::new();
-
     loop  {
         print!("$ ");
         io::stdout().flush().unwrap();
-        // println!("{}: command not found", input.strip_suffix("\n").unwrap());
-        input.clear();
+
+        let stdin = io::stdin();
+        let mut input = String::new();
         stdin.read_line(&mut input).unwrap();
         let command = input.trim();
-
-        if command.is_empty() {
-            continue;
-        } else if command == "exit 0" {
-            break;
-        } else {
-            println!("{}: command not found", command);
+        let token = tokenize(command);
+        match token[..] {
+            ["exit", code] => process::exit(code.parse::<i32>().unwrap()),
+            ["echo", ..] => println!("{}", token[1..].join(" ")),
+            _ => prompt(command),
         }
-        
     }
 }
+
+
+
+
+
